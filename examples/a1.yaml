@@ -1,0 +1,21 @@
+name: A Sunday walk
+description: our first simple adventure
+locations:
+  101:
+    id: 101
+    name: clearing
+    n:
+      desc: path to the north
+      locID: 102
+  102:
+    id: 102
+    name: fork in the path
+    s:
+      desc: path to the south
+      locID: 101
+  103:
+    id: 103
+    name: fork in the path
+    s:
+      desc: path to the south
+      locID: 104

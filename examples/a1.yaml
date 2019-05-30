@@ -1,5 +1,6 @@
 name: A Sunday walk
 description: our first simple adventure
+curLocation: 101
 locations:
   101:
     id: 101
@@ -15,7 +16,7 @@ locations:
       locID: 101
   103:
     id: 103
-    name: fork in the path
+    name: fork in the path, bad location
     s:
       desc: path to the south
       locID: 104

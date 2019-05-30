@@ -1,6 +1,8 @@
 package main
 
-import "github.com/spf13/cobra"
+import (
+	"github.com/spf13/cobra"
+)
 
 func init() {
 	cobra.OnInitialize(initConfig)
@@ -14,6 +16,4 @@ var rootCmd = &cobra.Command{
 	Use:   "explore",
 	Short: title,
 	Long:  title + directions,
-	Run: func(cmd *cobra.Command, args []string) {
-	},
 }

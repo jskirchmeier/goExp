@@ -3,6 +3,7 @@ package explore
 import "github.com/jskirchmeier/explore/simple"
 
 // A place and its contents, could be a room, a cave, a spot in the road
+// the name of the location will be used as : You are in a ........
 type Location struct {
 	simple.Identity `yaml:",inline"`
 

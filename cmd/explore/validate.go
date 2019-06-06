@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
-	"github.com/jskirchmeier/explore"
+
+	"github.com/jskirchmeier/explore/adventure"
+
 	"github.com/spf13/cobra"
 )
 
@@ -15,18 +17,19 @@ var validateCmd = &cobra.Command{
 
 		if len(args) < 1 {
 
-			fmt.Println("Path to file to validate must be defined")
+			fmt.Println("Name of the adventure validate must be defined")
 			return
 		}
 		fmt.Println("Validating adventure : ", args[0])
 
-		a, err := explore.NewAdventure(args[0])
+		a := adventure.New(args[0])
 
-		if err != nil {
-			fmt.Println(err)
+		if a == nil {
+
+			fmt.Println("no adventure by the name " + args[0] + " was found")
 			return
 		}
-		a.Validate()
+		// TODO add validation code
 
 	},
 }

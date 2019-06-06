@@ -2,10 +2,11 @@ package main
 
 import (
 	"fmt"
-	"github.com/jskirchmeier/explore"
+	"os"
+
+	"github.com/jskirchmeier/explore/adventure"
 	"github.com/jskirchmeier/explore/cli"
 	"github.com/spf13/cobra"
-	"os"
 )
 
 var loadCmd = &cobra.Command{
@@ -15,18 +16,15 @@ var loadCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println(title)
 
-		// the root run is the CLI runner
-		// to run the server use that command
 		if len(args) < 1 {
 			fmt.Println("must pass in the adventure you want to do")
 			os.Exit(1)
 		}
-		a, err := explore.NewAdventure(args[0])
-		if err != nil {
-			fmt.Println("Unable to start", err.Error())
+		a := adventure.New(args[0])
+		if a == nil {
+			fmt.Println("No adventure with the name " + args[0] + " is available")
 			os.Exit(2)
 		}
-
 		runner := cli.Runner{}
 		runner.Run(a) // blocks
 

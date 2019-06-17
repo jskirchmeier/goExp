@@ -1,10 +1,11 @@
 package command
 
 import (
-	"github.com/jskirchmeier/explore/adventure"
-	"io"
 	"log"
+	"strings"
 	"text/template"
+
+	"github.com/jskirchmeier/explore/adventure"
 )
 
 const (
@@ -20,18 +21,19 @@ Ready...
 var templateWelcome *template.Template
 
 // welcome prints out the starting message for the user
-func welcome(a *adventure.Adventure, _ []string, out io.Writer) (changeState bool) {
+func welcome(a *adventure.Adventure, _ []string) Response {
 
-	err := templateWelcome.Execute(out, a)
+	buf := &strings.Builder{}
+	err := templateWelcome.Execute(buf, a)
 	if err != nil {
 		// TODO : clean this up
 		log.Fatal(err)
 	}
-	return false
+	return Response{}
 }
 
 func init() {
-	Register(Func(welcome), "start", "welcome")
+	Register(HandlerFunc(welcome), "start", "welcome")
 	var err error
 	templateWelcome, err = template.New("welcome").Parse(welcomeText)
 	if err != nil {

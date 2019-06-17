@@ -3,8 +3,6 @@ package main
 import (
 	"fmt"
 
-	"github.com/jskirchmeier/explore/adventure"
-
 	"github.com/spf13/cobra"
 )
 
@@ -22,7 +20,7 @@ var validateCmd = &cobra.Command{
 		}
 		fmt.Println("Validating adventure : ", args[0])
 
-		a := adventure.New(args[0])
+		a := newAdventure(args[0])
 
 		if a == nil {
 

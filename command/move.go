@@ -1,29 +1,26 @@
 package command
 
 import (
+	"errors"
 	"github.com/jskirchmeier/explore/adventure"
-	"io"
 )
 
-func move(a *adventure.Adventure, cmd []string, out io.Writer) (changeState bool) {
+func move(a *adventure.Adventure, cmds []string) Response {
 
 	// cmd[0] is the move command
 	// cmd[1] is the direction
-	if len(cmd) < 2 {
-		_, _ = out.Write([]byte("You must specify what direction to wish to go."))
-		return false
+	if len(cmds) < 2 {
+		return Response{Err: errors.New("direction to move must be specified")}
 
 	}
-
-	newLoc := a.CurrentLocation.Go(cmd[1])
+	newLoc := a.CurrentLocation.Go(cmds[1])
 	if newLoc == nil {
-		_, _ = out.Write([]byte("You cannot go " + cmd[1]))
-		return false
+		return Response{Err: errors.New("you cannot go " + cmds[1])}
 	}
 	a.CurrentLocation = newLoc
-	return true
+	return Response{StateChange: true}
 }
 
 func init() {
-	Register(Func(move), "move", "go", "mv")
+	Register(HandlerFunc(move), "move", "go", "mv")
 }

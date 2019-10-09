@@ -1,69 +1,56 @@
 package command
 
 import (
-	"errors"
 	"fmt"
-	"log"
+	"strings"
 
-	"github.com/jskirchmeier/explore/adventure"
+	"github.com/jskirchmeier/explore/entity"
 )
 
-// Response contains all of the possible elements
-// that a command handler can return
-// StateChange - the command changed the state of the adventure
-// Exit - we are done, say goodbye and terminate
-// Text - Explain to the user that happened (optional)
-// Err - Something happened, unable to execute command
-// TODO : do we need a separate Text and Err fields?
-type Response struct {
-	StateChange bool
-	Exit        bool
-	Text        string
-	Err         error
+// Context gives the command all the information it needs to perform its job
+// TODO move into runner package when ready, has to add methods to allow commands to modify state
+// TODO how do we return response to user
+type Context struct {
+	Turn         int               // what turn are we on
+	User         string            // wio is playing
+	CurLocation  string            // where are we : TODO change to location object once that is completed
+	CurContainer *entity.Container // what are we looking at (a location is also a container so it could be both)
+
 }
 
-// Handler performs some action using the cmds and adventure instance to do so.
-// the output type is what kind of text we want, the options are html, ansi (colored console), and plain
-type Handler interface {
-	Execute(adventure *adventure.Adventure, cmds []string) Response
+type Command interface {
+	Execute(ctx *Context, params ...string) error
 }
 
-// HandlerFunc allows a function to act as a Handler
-type HandlerFunc func(adventure *adventure.Adventure, cmds []string) Response
+type CommandFunc func(ctx *Context, params ...string) error
 
-func (f HandlerFunc) Execute(adventure *adventure.Adventure, cmds []string) Response {
-	return f(adventure, cmds)
+func (cf CommandFunc) Execute(ctx *Context, params ...string) error {
+	return cf(ctx, params...)
 }
 
-var commands = make(map[string]Handler)
+// Commander is the entry point to the commands
+type Commander interface {
+	Execute(ctx *Context, cmd string) error
+}
 
-// Register makes the command available for use in the adventure
-// A one or more names of how the command can be fired must be supplied.  Names MUST be unique!!!!!
-func Register(h Handler, names ...string) {
-	fmt.Println("Registering commands : ", names)
-	if len(names) == 0 {
-		log.Fatal("At least one name must be registered with a command")
+func NewCommander() Commander {
+	c := &implCommander{make(map[string]Command)}
+
+	return c
+}
+
+type implCommander struct {
+	commands map[string]Command
+}
+
+func (c *implCommander) Execute(ctx *Context, cmd string) error {
+	words := strings.Fields(cmd)
+	if len(words) == 0 {
+		return fmt.Errorf("command line is blank")
 	}
-	for _, n := range names {
-		if _, ok := commands[n]; ok {
-			log.Fatal("Handler names must be unique, " + n + " is already in use")
-		}
-		commands[n] = h
-	}
-}
-
-// Execute finds the proper command handler and executes it.
-// The first element in cmd must be the command.  It is assumed that all of cmd are in lower case.
-// Only single work commands are supported, sub commands can be used if supported by the particular command
-func Execute(adventure *adventure.Adventure, cmds []string) Response {
-	if len(cmds) == 0 {
-		return Response{Err: errors.New("no command found")}
-	}
-
-	c, ok := commands[cmds[0]]
-
+	command, ok := c.commands[words[0]]
 	if !ok {
-		return Response{Err: errors.New("not a recognized command : " + cmds[0])}
+		return fmt.Errorf("unknown command (%s)", words[0])
 	}
-	return c.Execute(adventure, cmds)
+	return command.Execute(ctx, words[1:]...)
 }

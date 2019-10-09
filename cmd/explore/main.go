@@ -15,7 +15,7 @@ ___________              .__
 /_______  /__/\_ \|   __/|____/\____/|__|    \___  >
         \/      \/|__|                           \/
 
-`
+Welcome`
 
 const directions = `
 This will be an explanation of how this works
